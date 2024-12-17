@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logoutput
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logoutput
+  template:
+    metadata:
+      labels:
+        app: logoutput
+    spec:
+      volumes:
+        - name: shared-pv
+          persistentVolumeClaim:
+            claimName: sharefile-claim
+      containers:
+        - name: logoutput
+          image: juanchobanano13/logoutput:v0.1.1
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8001"
+          volumeMounts:
+          - name: shared-pv
+            mountPath: /usr/src/app/files
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong
+  template:
+    metadata:
+      labels:
+        app: pingpong
+    spec:
+      volumes:
+        - name: shared-pv
+          persistentVolumeClaim:
+            claimName: sharefile-claim
+      containers:
+        - name: pingpong
+          image: juanchobanano13/pingpong:v0.1.1
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8002"
+          volumeMounts:
+          - name: shared-pv
+            mountPath: /usr/src/app/files

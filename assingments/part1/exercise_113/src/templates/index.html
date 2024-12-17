@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Todo App</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>FastAPI Todo App</h1>
+    <img src="{{ image_url }}" alt="Random Image" style="max-width: 30%; height: auto;">
+    <p>Add a new todo (140 characters max):</p>
+    <input type="text" id="todoInput" placeholder="Enter your todo here">
+    <button onclick="addTodo()">Send</button>
+    <p id="error" class="error"></p>
+    <h2>Todo List</h2>
+    <ul>
+        <li>Learn FastAPI</li>
+        <li>Build a project</li>
+        <li>Test persistence</li>
+    </ul>
+    <script>
+        function addTodo() {
+            const inputField = document.getElementById("todoInput");
+            const errorField = document.getElementById("error");
+            const todo = inputField.value.trim();
+            if (todo.length === 0) {
+                errorField.textContent = "Todo cannot be empty.";
+            } else if (todo.length > 140) {
+                errorField.textContent = "Todo cannot exceed 140 characters.";
+            } else {
+                errorField.textContent = "";
+                alert(`Todo added: ${todo}`);  // Placeholder for actual functionality
+            }
+            inputField.value = "";
+        }
+    </script>
+</body>
+</html>

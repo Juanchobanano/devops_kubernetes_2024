@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logoutput
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logoutput
+  template:
+    metadata:
+      labels:
+        app: logoutput
+    spec:
+      containers:
+        - name: logoutput
+          image: juanchobanano13/logoutput:v0.2.1
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8001"
+            - name: PINGPONG_HOST
+              value: "pingpong-svc"
+            - name: PINGPONG_PORT
+              value: "2346"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong
+  template:
+    metadata:
+      labels:
+        app: pingpong
+    spec:
+      containers:
+        - name: pingpong
+          image: juanchobanano13/pingpong:v0.2.1
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8002"

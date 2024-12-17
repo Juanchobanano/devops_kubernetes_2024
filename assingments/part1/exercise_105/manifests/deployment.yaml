@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubernetes-2024-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubernetes-2024-project
+  template:
+    metadata:
+      labels:
+        app: kubernetes-2024-project
+    spec:
+      containers:
+        - name: kubernetes-2024-project
+          image: juanchobanano13/kubernetes-2024-project:v0.5
+          env:
+            - name: PORT
+              value: "8000"

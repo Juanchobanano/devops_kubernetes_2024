@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app
+  namespace: project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      volumes:
+        - name: shared-pv
+          persistentVolumeClaim:
+            claimName: sharefile-claim
+      containers:
+        - name: todo-app
+          image: juanchobanano13/todo-app:v0.2.2
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8000"
+            - name: TODOS_HOST
+              value: "todo-backend-svc.project"
+            - name: TODOS_PORT
+              value: "2348"
+          volumeMounts:
+          - name: shared-pv
+            mountPath: /usr/src/app/files
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-backend
+  namespace: project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-backend
+  template:
+    metadata:
+      labels:
+        app: todo-backend
+    spec:
+      containers:
+        - name: todo-backend
+          image: juanchobanano13/todo-backend:v0.2.2
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8001"

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logoutput-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logoutput-pod
+  template:
+    metadata:
+      labels:
+        app: logoutput-pod
+    spec:
+      volumes: # Define volume
+        - name: shared-file
+          emptyDir: {}
+      containers:
+        - name: logoutput-reader
+          image: juanchobanano13/logoutput-reader:v0.1.0
+          imagePullPolicy: Always
+          volumeMounts: # Mount volume
+          - name: shared-file
+            mountPath: /usr/src/app/files
+        - name: logoutput-writer
+          image: juanchobanano13/logoutput-writer:v0.1.0
+          imagePullPolicy: Always
+          volumeMounts: # Mount volume
+          - name: shared-file
+            mountPath: /usr/src/app/files
