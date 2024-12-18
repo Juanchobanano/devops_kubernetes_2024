@@ -15,20 +15,11 @@ env:
 jobs:
   build-publish-deploy:
     name: Build, Publish and Deploy
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
 
-      - name: Install tar
-        run: apt-get update && apt-get install -y tar
-
-      - name: Debug Environment
-        run: |
-          which tar
-          echo $PATH
-
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Get credentials
         uses: google-github-actions/auth@v2
