@@ -18,6 +18,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
+      - name: Debug Environment
+        run: |
+          which tar
+          echo $PATH
+
       - name: Checkout
         uses: actions/checkout@v4
 
