@@ -163,3 +163,4 @@ cython_debug/
 laundrybot
 commands.sh
 .DS_Store
+private-key.json
