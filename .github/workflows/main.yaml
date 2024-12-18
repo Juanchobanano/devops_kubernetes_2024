@@ -20,6 +20,16 @@ jobs:
     steps:
 
       - uses: actions/checkout@v4
+      
+      - name: 'Print variables'
+        run: |-
+          echo $PROJECT_ID
+          echo $GKE_CLUSTER
+          echo $GKE_ZONE
+          echo $IMAGE
+          echo $SERVICE
+          echo $BRANCH
+          echo $IMAGE_PATH
 
       - uses: google-github-actions/auth@v2
         with:
