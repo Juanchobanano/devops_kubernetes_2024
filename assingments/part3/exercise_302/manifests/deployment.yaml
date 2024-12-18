@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logoutput
+  namespace: exercises
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logoutput
+  template:
+    metadata:
+      labels:
+        app: logoutput
+    spec:
+      containers:
+        - name: logoutput
+          image: juanchobanano13/logoutput:v0.3.2
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8001"
+            - name: PINGPONG_HOST
+              value: "pingpong-svc.exercises"
+            - name: PINGPONG_PORT
+              value: "2346"
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: example-configmap
+                  key: message
+          volumeMounts:
+          - name: config
+            mountPath: "/config"
+            readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: example-configmap
+            items:
+            - key: "serverconfig.txt"
+              path: "serverconfig.txt"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong
+  namespace: exercises
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong
+  template:
+    metadata:
+      labels:
+        app: pingpong
+    spec:
+      containers:
+        - name: pingpong
+          image: juanchobanano13/pingpong:v0.3.2
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8002"
+            - name: DATABASE_HOST
+              value: "postgres-svc.exercises"
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
