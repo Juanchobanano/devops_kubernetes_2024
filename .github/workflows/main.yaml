@@ -10,7 +10,7 @@ env:
   IMAGE: dwk-environments
   SERVICE: dwk-environments
   BRANCH: ${{ github.ref_name }}  
-  PATH: course_material/part3/deployment
+  IMAGE_PATH: course_material/part3/deployment
 
 jobs:
   build-publish-deploy:
@@ -44,7 +44,7 @@ jobs:
 
       - name: Build
         run: |-
-          cd $PATH
+          cd $IMAGE_PATH
           docker build --tag "gcr.io/$PROJECT_ID/$IMAGE:$BRANCH-$GITHUB_SHA" .
       
       - name: Publish
@@ -55,7 +55,7 @@ jobs:
 
       - name: Deploy
         run: |-
-          cd $PATH
+          cd $IMAGE_PATH
           kustomize edit set image PROJECT/IMAGE=gcr.io/$PROJECT_ID/$IMAGE:$BRANCH-$GITHUB_SHA
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment $SERVICE
