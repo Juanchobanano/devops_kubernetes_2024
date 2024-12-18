@@ -20,7 +20,7 @@ jobs:
     steps:
 
       - name: Install tar
-        run: apt-get update && apt-get install -y tar
+        run: apt update && apt install -y tar
 
       - name: Debug Environment
         run: |
