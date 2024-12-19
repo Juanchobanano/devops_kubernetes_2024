@@ -21,9 +21,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check Secrets
-        run:  |-
-          echo "Secret length: ${#{{ secrets.GKE_SA_KEY }}}"
+      - name: Check Secret Length
+        run: |
+          if [ -z "${{ secrets.GKE_SA_KEY }}" ]; then
+            echo "Secret is empty or not set!"
+            exit 1
+          else
+            echo "Secret length: ${#GKE_SA_KEY}"
+          fi
+        env:
+          GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }}
+
 
       - uses: google-github-actions/auth@v2
         with:
