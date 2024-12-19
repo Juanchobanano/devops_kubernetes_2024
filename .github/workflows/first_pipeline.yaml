@@ -23,7 +23,7 @@ jobs:
 
       - name: Print MY_VARIABLE
         run: |-
-          echo ${MY_VARIABLE}
+          echo ${{ MY_VARIABLE }}
 
       - uses: google-github-actions/auth@v2
         with:
