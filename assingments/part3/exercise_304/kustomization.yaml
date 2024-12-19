@@ -18,3 +18,4 @@ images:
     newName: juanchobanano13/todo-backend:v0.3.3
   - name: PROJECT/REMAINDER_IMAGE
     newName: juanchobanano13/reminder:v0.3.3
+

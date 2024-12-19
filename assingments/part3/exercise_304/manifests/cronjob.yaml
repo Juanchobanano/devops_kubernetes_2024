@@ -2,7 +2,6 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: random-wiki-reminder
-  namespace: project
 spec:
   schedule: "0 * * * *" # Runs at the start of every hour
   jobTemplate:

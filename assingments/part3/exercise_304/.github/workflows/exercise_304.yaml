@@ -3,7 +3,7 @@ name: Release application
 on:
   push:
     paths:
-      - 'assignments/part3/exercise_303/**' 
+      - 'assingments/part3/exercise_304/**' 
       - '.github/workflows/project.yaml'
 
 env:
@@ -13,7 +13,7 @@ env:
   TODO_APP_IMAGE: dwk-todo-app
   TODO_BACKEND_IMAGE: dwk-todo-backend
   REMAINDER_IMAGE: dwk-remainder
-  DEPLOYMENT: dwk-project
+  DEPLOYMENT: todo-app
   BRANCH: ${{ github.ref_name }}
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./assignments/part3/exercise_303
+        working-directory: ./assingments/part3/exercise_304
 
     steps:
       - name: Checkout
