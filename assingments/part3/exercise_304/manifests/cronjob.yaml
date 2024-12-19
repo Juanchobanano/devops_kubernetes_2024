@@ -10,8 +10,8 @@ spec:
       template:
         spec:
           containers:
-            - name: random-wiki-reminder
-              image: juanchobanano13/remainder:v0.2.9
+            - name: reminder
+              image: PROJECT/REMAINDER_IMAGE
               imagePullPolicy: Always
               env:
                 - name: TODOS_HOST

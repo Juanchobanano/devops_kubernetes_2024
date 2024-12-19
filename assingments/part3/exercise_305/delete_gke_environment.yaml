@@ -1,0 +1,32 @@
+name: Delete Environment
+
+on:
+  delete:
+    branches:
+      - "*"
+
+jobs:
+  delete-environment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: 'Use gcloud CLI'
+        run: gcloud info
+
+      - name: Delete Kubernetes namespace for the branch
+        run: |
+          # Extract the branch name from the GitHub reference
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          
+          # Skip if the main branch is deleted (we don't delete the default namespace)
+          if [[ "$BRANCH_NAME" != "main" ]]; then
+            # Delete the namespace for the branch
+            kubectl delete namespace $BRANCH_NAME || echo "Namespace $BRANCH_NAME does not exist"
+          fi

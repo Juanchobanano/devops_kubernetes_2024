@@ -3,17 +3,15 @@ name: Release application
 on:
   push:
     paths:
-      - 'assignments/part3/exercise_303/**' 
-      - '.github/workflows/project.yaml'
+      - 'course_material/part3/deployment/**' 
+      - '.github/workflows/second_pipeline.yaml'
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
-  TODO_APP_IMAGE: dwk-todo-app
-  TODO_BACKEND_IMAGE: dwk-todo-backend
-  REMAINDER_IMAGE: dwk-remainder
-  DEPLOYMENT: dwk-project
+  IMAGE: dwk-environments
+  DEPLOYMENT: dwk-environments
   BRANCH: ${{ github.ref_name }}
 
 jobs:
@@ -22,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./assignments/part3/exercise_303
+        working-directory: ./course_material/part3/deployment
 
     steps:
       - name: Checkout
@@ -49,23 +47,18 @@ jobs:
 
       - name: Build and publish
         run: |-
-          docker build --tag "gcr.io/$PROJECT_ID/$TODO_APP_IMAGE:$BRANCH-$GITHUB_SHA" ./todo-app
-          docker push "gcr.io/$PROJECT_ID/$TODO_APP_IMAGE:$BRANCH-$GITHUB_SHA"
-
-          docker build --tag "gcr.io/$PROJECT_ID/$TODO_BACKEND_IMAGE:$BRANCH-$GITHUB_SHA" ./todo-backend
-          docker push "gcr.io/$PROJECT_ID/$TODO_BACKEND_IMAGE:$BRANCH-$GITHUB_SHA"
-
-          docker build --tag "gcr.io/$PROJECT_ID/$REMAINDER_IMAGE:$BRANCH-$GITHUB_SHA" ./remainder
-          docker push "gcr.io/$PROJECT_ID/$REMAINDER_IMAGE:$BRANCH-$GITHUB_SHA"
+          docker build --tag "gcr.io/$PROJECT_ID/$IMAGE:$BRANCH-$GITHUB_SHA" .
+          docker push "gcr.io/$PROJECT_ID/$IMAGE:$BRANCH-$GITHUB_SHA"
 
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2
 
       - name: Deploy
         run: |-
-          kustomize edit set image PROJECT/TODO_APP_IMAGE=gcr.io/$PROJECT_ID/$TODO_APP_IMAGE:$BRANCH-$GITHUB_SHA
-          kustomize edit set image PROJECT/TODO_BACKEND_IMAGE=gcr.io/$PROJECT_ID/$TODO_BACKEND_IMAGE:$BRANCH-$GITHUB_SHA
-          kustomize edit set image PROJECT/REMAINDER_IMAGE=gcr.io/$PROJECT_ID/$REMAINDER_IMAGE:$BRANCH-$GITHUB_SHA
+          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
+          kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
+          kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+          kustomize edit set image PROJECT/IMAGE=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment $DEPLOYMENT
           kubectl get services -o wide

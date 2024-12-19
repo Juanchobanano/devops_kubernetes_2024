@@ -19,7 +19,7 @@ spec:
             claimName: sharefile-claim
       containers:
         - name: todo-app
-          image: juanchobanano13/todo-app:v0.2.8
+          image: PROJECT/TODO_APP_IMAGE
           imagePullPolicy: Always
           env:
             - name: PORT
@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
         - name: todo-backend
-          image: juanchobanano13/todo-backend:v0.2.8
+          image: PROJECT/TODO_BACKEND_IMAGE
           imagePullPolicy: Always
           env:
             - name: PORT

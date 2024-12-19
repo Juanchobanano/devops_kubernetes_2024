@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - manifests/configmap.yaml
+  - manifests/cronjob.yaml
+  - manifests/deployment.yaml
+  - manifests/ingress.yaml
+  - manifests/persistentvolume.yaml
+  - manifests/persistentvolumeclaim.yaml
+  - manifests/podfordebugging.yaml
+  - manifests/secret.yaml
+  - manifests/service.yaml
+  - manifests/statefulset.yaml
+images:
+  - name: PROJECT/TODO_APP_IMAGE
+    newName: juanchobanano13/todo-app:v0.3.3
+  - name: PROJECT/TODO_BACKEND_IMAGE
+    newName: juanchobanano13/todo-backend:v0.3.3
+  - name: PROJECT/REMAINDER_IMAGE
+    newName: juanchobanano13/reminder:v0.3.3
