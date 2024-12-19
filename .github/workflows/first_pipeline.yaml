@@ -21,9 +21,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Print MY_VARIABLE
-        run: |-
-          echo ${{ vars.MY_VARIABLE }}
+      - name: Check Secrets
+        run:  |-
+          echo "Secret length: ${#{{ secrets.GKE_SA_KEY }}}"
 
       - uses: google-github-actions/auth@v2
         with:
