@@ -5,7 +5,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  MY_VARIABLE: '${{ vars.MY_VARIABLE }}'
+  #MY_VARIABLE: '${{ vars.MY_VARIABLE }}'
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
   IMAGE: dwk-environments
@@ -23,7 +23,7 @@ jobs:
 
       - name: Print MY_VARIABLE
         run: |-
-          echo ${{ MY_VARIABLE }}
+          echo ${{ vars.MY_VARIABLE }}
 
       - uses: google-github-actions/auth@v2
         with:
