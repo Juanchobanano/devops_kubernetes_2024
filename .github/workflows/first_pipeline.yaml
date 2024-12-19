@@ -21,8 +21,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+
       - name: Check Project ID
-      
         run: |
           if [ -z "${{ secrets.GKE_PROJECT }}" ]; then
             echo "Project ID is empty or not set!"
