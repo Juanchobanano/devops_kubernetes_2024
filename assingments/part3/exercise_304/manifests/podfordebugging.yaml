@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: my-busybox
-  namespace: project
+  namespace: PROJECT/NAMESPACE
   labels:
     app: my-busybox
 spec:

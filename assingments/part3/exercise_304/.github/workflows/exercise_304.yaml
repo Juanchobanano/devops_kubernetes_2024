@@ -3,7 +3,7 @@ name: Release application
 on:
   push:
     paths:
-      - 'assignments/part3/exercise_303/**' 
+      - 'assignments/part3/exercise_304/**' 
       - '.github/workflows/project.yaml'
 
 env:
@@ -13,7 +13,7 @@ env:
   TODO_APP_IMAGE: dwk-todo-app
   TODO_BACKEND_IMAGE: dwk-todo-backend
   REMAINDER_IMAGE: dwk-remainder
-  DEPLOYMENT: dwk-project
+  DEPLOYMENT: todo-app
   BRANCH: ${{ github.ref_name }}
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./assignments/part3/exercise_303
+        working-directory: ./assignments/part3/exercise_304
 
     steps:
       - name: Checkout
@@ -69,6 +69,7 @@ jobs:
           kustomize edit set image PROJECT/TODO_APP_IMAGE=gcr.io/$PROJECT_ID/$TODO_APP_IMAGE:$BRANCH-$GITHUB_SHA
           kustomize edit set image PROJECT/TODO_BACKEND_IMAGE=gcr.io/$PROJECT_ID/$TODO_BACKEND_IMAGE:$BRANCH-$GITHUB_SHA
           kustomize edit set image PROJECT/REMAINDER_IMAGE=gcr.io/$PROJECT_ID/$REMAINDER_IMAGE:$BRANCH-$GITHUB_SHA
+          kustomize edit set namespace PROJECT/NAMESPACE=${GITHUB_REF#refs/heads/}
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment $DEPLOYMENT
           kubectl get services -o wide

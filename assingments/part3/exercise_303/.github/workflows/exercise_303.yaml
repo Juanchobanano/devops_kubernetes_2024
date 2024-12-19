@@ -3,7 +3,7 @@ name: Release application
 on:
   push:
     paths:
-      - 'assignments/part3/exercise_303/**' 
+      - 'assingments/part3/exercise_303/**' 
       - '.github/workflows/project.yaml'
 
 env:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./assignments/part3/exercise_303
+        working-directory: ./assingments/part3/exercise_303
 
     steps:
       - name: Checkout
