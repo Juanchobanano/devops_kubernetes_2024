@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  #PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   #MY_VARIABLE: '${{ vars.MY_VARIABLE }}'
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
@@ -20,6 +20,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check Project ID
+        run: |
+          if [ -z "${{ secrets.GKE_PROJECT }}" ]; then
+            echo "Project ID is empty or not set!"
+            exit 1
+          else
+            echo "Secret length: ${#GKE_PROJECT}"
+          fi
+        env:
+          GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
 
       - name: Check Secret Length
         run: |
