@@ -6,6 +6,7 @@ on:
       - 'assingments/part3/exercise_310/**' 
       - '.github/workflows/project.yaml'
 
+
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: dwk-cluster
