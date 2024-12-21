@@ -24,7 +24,7 @@ spec:
             - name: PORT
               value: "8000"
             - name: TODOS_HOST
-              value: "todo-backend-svc.project"
+              value: "todo-backend-svc"
             - name: TODOS_PORT
               value: "2348"
           volumeMounts:
@@ -53,7 +53,7 @@ spec:
             - name: PORT
               value: "8001"
             - name: DATABASE_HOST
-              value: "postgres-svc.project"
+              value: "postgres-svc"
             - name: DATABASE_PORT
               value: "5432"
             - name: POSTGRES_DB

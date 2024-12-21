@@ -24,6 +24,7 @@ jobs:
         run: |
           # Extract the branch name from the GitHub reference
           BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "Branch name: $BRANCH_NAME"
           
           # Skip if the main branch is deleted (we don't delete the default namespace)
           if [[ "$BRANCH_NAME" != "main" ]]; then
