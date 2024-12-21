@@ -5,6 +5,11 @@ on:
     branches:
       - "*"
 
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+
 jobs:
   delete-environment:
     runs-on: ubuntu-latest
