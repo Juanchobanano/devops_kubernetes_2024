@@ -3,7 +3,7 @@ name: Release application
 on:
   push:
     paths:
-      - 'assingments/part3/exercise_310/**' 
+      - 'assingments/part3/exercise_308/**' 
       - '.github/workflows/project.yaml'
 
 env:
@@ -13,6 +13,7 @@ env:
   TODO_APP_IMAGE: dwk-todo-app
   TODO_BACKEND_IMAGE: dwk-todo-backend
   REMAINDER_IMAGE: dwk-remainder
+  BACKUP_IMAGE: dwk-backup
   DEPLOYMENT: todo-app
   BRANCH: ${{ github.ref_name }}
 
@@ -22,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./assingments/part3/exercise_310
+        working-directory: ./assingments/part3/exercise_308
 
     steps:
       - name: Checkout
@@ -58,6 +59,9 @@ jobs:
           docker build --tag "gcr.io/$PROJECT_ID/$REMAINDER_IMAGE:$BRANCH-$GITHUB_SHA" ./remainder
           docker push "gcr.io/$PROJECT_ID/$REMAINDER_IMAGE:$BRANCH-$GITHUB_SHA"
 
+          docker build --tag "gcr.io/$PROJECT_ID/$BACKUP_IMAGE:$BRANCH-$GITHUB_SHA" ./backup
+          docker push "gcr.io/$PROJECT_ID/$BACKUP_IMAGE:$BRANCH-$GITHUB_SHA"
+
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2
 
@@ -69,6 +73,7 @@ jobs:
           kustomize edit set image PROJECT/TODO_APP_IMAGE=gcr.io/$PROJECT_ID/$TODO_APP_IMAGE:$BRANCH-$GITHUB_SHA
           kustomize edit set image PROJECT/TODO_BACKEND_IMAGE=gcr.io/$PROJECT_ID/$TODO_BACKEND_IMAGE:$BRANCH-$GITHUB_SHA
           kustomize edit set image PROJECT/REMAINDER_IMAGE=gcr.io/$PROJECT_ID/$REMAINDER_IMAGE:$BRANCH-$GITHUB_SHA
+          kustomize edit set image PROJECT/BACKUP_IMAGE=gcr.io/$PROJECT_ID/$BACKUP_IMAGE:$BRANCH-$GITHUB_SHA
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment $DEPLOYMENT
           kubectl get services -o wide

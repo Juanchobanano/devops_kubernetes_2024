@@ -1,21 +1,57 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logoutput
-  namespace: exercises
+  name: todo-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: logoutput
+      app: todo-app
   template:
     metadata:
       labels:
-        app: logoutput
+        app: todo-app
+    spec:
+      volumes:
+        - name: shared-pv
+          persistentVolumeClaim:
+            claimName: sharefile-claim
+      containers:
+        - name: todo-app
+          image: PROJECT/TODO_APP_IMAGE
+          resources:
+            limits:
+              cpu: "150m"
+              memory: "100Mi"
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8000"
+            - name: TODOS_HOST
+              value: "todo-backend-svc"
+            - name: TODOS_PORT
+              value: "2348"
+          volumeMounts:
+          - name: shared-pv
+            mountPath: /usr/src/app/files
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-backend
+  template:
+    metadata:
+      labels:
+        app: todo-backend
     spec:
       containers:
-        - name: logoutput
-          image: juanchobanano13/logoutput:v0.3.9
+        - name: todo-backend
+          image: PROJECT/TODO_BACKEND_IMAGE
           resources:
             limits:
               cpu: "150m"
@@ -24,55 +60,8 @@ spec:
           env:
             - name: PORT
               value: "8001"
-            - name: PINGPONG_HOST
-              value: "pingpong-svc.exercises"
-            - name: PINGPONG_PORT
-              value: "2346"
-            - name: MESSAGE
-              valueFrom:
-                configMapKeyRef:
-                  name: example-configmap
-                  key: message
-          volumeMounts:
-          - name: config
-            mountPath: "/config"
-            readOnly: true
-      volumes:
-        - name: config
-          configMap:
-            name: example-configmap
-            items:
-            - key: "serverconfig.txt"
-              path: "serverconfig.txt"
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: pingpong
-  namespace: exercises
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: pingpong
-  template:
-    metadata:
-      labels:
-        app: pingpong
-    spec:
-      containers:
-        - name: pingpong
-          image: juanchobanano13/pingpong:v0.3.9
-          resources:
-            limits:
-              cpu: "150m"
-              memory: "100Mi"
-          imagePullPolicy: Always
-          env:
-            - name: PORT
-              value: "8002"
             - name: DATABASE_HOST
-              value: "postgres-svc.exercises"
+              value: "postgres-svc"
             - name: DATABASE_PORT
               value: "5432"
             - name: POSTGRES_DB
