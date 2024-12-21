@@ -20,6 +20,17 @@ jobs:
       - name: 'Use gcloud CLI'
         run: gcloud info
 
+      - name: 'Get GKE credentials'
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: '${{ env.GKE_CLUSTER }}'
+          project_id: '${{ env.PROJECT_ID }}'
+          location: '${{ env.GKE_ZONE }}'
+
+      - name: Print namespaces
+        run: |
+          kubectl get namespaces
+
       - name: Delete Kubernetes namespace for the branch
         run: |
           # Extract the branch name from the GitHub reference
