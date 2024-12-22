@@ -3,7 +3,7 @@ name: Release project application
 on:
   push:
     paths:
-      - 'assingments/part3/exercise_303/**' 
+      - 'assingments/part3/exercise_310/**' 
       - '.github/workflows/project.yaml'
 
 env:
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./assingments/part3/exercise_303
+        working-directory: ./assingments/part3/exercise_310
 
     steps:
       - name: Checkout
@@ -67,7 +67,10 @@ jobs:
 
       - name: Deploy
         run: |-
-          NAMESPACE=project
+          NAMESPACE=${GITHUB_REF#refs/heads/}
+          if [[ "$NAMESPACE" == "main" ]]; then
+            NAMESPACE="default"
+          fi
           kubectl create namespace $NAMESPACE || true
           kubectl config set-context --current --namespace=$NAMESPACE
           kustomize edit set namespace $NAMESPACE

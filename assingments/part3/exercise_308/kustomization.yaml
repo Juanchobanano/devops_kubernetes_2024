@@ -5,7 +5,6 @@ resources:
   - manifests/cronjob.yaml
   - manifests/deployment.yaml
   - manifests/ingress.yaml
-  - manifests/persistentvolume.yaml
   - manifests/persistentvolumeclaim.yaml
   - manifests/podfordebugging.yaml
   - manifests/secret.yaml
@@ -15,7 +14,7 @@ images:
   - name: PROJECT/TODO_APP_IMAGE
     newName: gcr.io/dwk-gke-445012/dwk-todo-app:main-0f65a705390061c15e5adb49698172e4e8c2c8be
   - name: PROJECT/TODO_BACKEND_IMAGE
-    newName: gcr.io/dwk-gke-445012/dwk-todo-backend:main-0f65a705390061c15e5adb49698172e4e8c2c8be
+    newName: gcr.io/dwk-gke-445012/dwk-todo-backend:main-072243f9edbe4d25ba47e155c6081368640d1d20
   - name: PROJECT/REMAINDER_IMAGE
     newName: gcr.io/dwk-gke-445012/dwk-remainder:main-0f65a705390061c15e5adb49698172e4e8c2c8be
   - name: PROJECT/BACKUP_IMAGE

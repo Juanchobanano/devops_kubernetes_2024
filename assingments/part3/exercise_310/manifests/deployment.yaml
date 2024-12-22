@@ -12,17 +12,17 @@ spec:
       labels:
         app: todo-app
     spec:
-      # volumes:
-      #   - name: shared-pv
-      #     persistentVolumeClaim:
-      #       claimName: sharefile-claim
+      volumes:
+        - name: shared-pv
+          persistentVolumeClaim:
+            claimName: sharefile-claim
       containers:
         - name: todo-app
           image: PROJECT/TODO_APP_IMAGE
           # resources:
           #   limits:
-          #     cpu: "150m"
-          #     memory: "100Mi"
+          #     cpu: "6m"
+          #     memory: "50Mi"
           imagePullPolicy: Always
           env:
             - name: PORT
@@ -31,9 +31,9 @@ spec:
               value: "todo-backend-svc"
             - name: TODOS_PORT
               value: "2348"
-          # volumeMounts:
-          # - name: shared-pv
-          #   mountPath: /usr/src/app/files
+          volumeMounts:
+          - name: shared-pv
+            mountPath: /usr/src/app/files
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -54,7 +54,7 @@ spec:
           image: PROJECT/TODO_BACKEND_IMAGE
           # resources:
           #   limits:
-          #     cpu: "150m"
+          #     cpu: "6m"
           #     memory: "100Mi"
           imagePullPolicy: Always
           env:
