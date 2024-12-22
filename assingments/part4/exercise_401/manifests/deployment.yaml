@@ -36,6 +36,15 @@ spec:
           - name: config
             mountPath: "/config"
             readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 2346
+              httpHeaders:
+                - name: Host
+                  value: pingpong-svc
+            initialDelaySeconds: 5
+            periodSeconds: 10
       volumes:
         - name: config
           configMap:
@@ -88,3 +97,9 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+          readinessProbe:
+            tcpSocket:
+              host: postgres-svc
+              port: 5432
+            initialDelaySeconds: 5
+            periodSeconds: 10

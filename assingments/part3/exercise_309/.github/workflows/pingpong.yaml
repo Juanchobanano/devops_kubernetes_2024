@@ -1,0 +1,69 @@
+name: Release application
+
+on:
+  push:
+    paths:
+      - 'assingments/part3/exercise_309/**' 
+      - '.github/workflows/pingpong.yaml'
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+  LOGOUTPUT_IMAGE: dwk-logoutput
+  PINGPONG_IMAGE: dwk-pingpong
+  DEPLOYMENT: logoutput
+  BRANCH: ${{ github.ref_name }}
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish and Deploy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./assingments/part3/exercise_309
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: 'Use gcloud CLI'
+        run: gcloud info
+
+      - run: gcloud --quiet auth configure-docker
+
+      - name: 'Get GKE credentials'
+        uses: 'google-github-actions/get-gke-credentials@v2'
+        with:
+          cluster_name: '${{ env.GKE_CLUSTER }}'
+          project_id: '${{ env.PROJECT_ID }}'
+          location: '${{ env.GKE_ZONE }}'
+
+      - name: Build and publish
+        run: |-
+          docker build --tag "gcr.io/$PROJECT_ID/$LOGOUTPUT_IMAGE:$BRANCH-$GITHUB_SHA" ./logoutput
+          docker push "gcr.io/$PROJECT_ID/$LOGOUTPUT_IMAGE:$BRANCH-$GITHUB_SHA"
+
+          docker build --tag "gcr.io/$PROJECT_ID/$PINGPONG_IMAGE:$BRANCH-$GITHUB_SHA" ./pingpong
+          docker push "gcr.io/$PROJECT_ID/$PINGPONG_IMAGE:$BRANCH-$GITHUB_SHA"
+  
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Deploy
+        run: |-
+          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
+          kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
+          kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+          kustomize edit set image PROJECT/LOGOUTPUT_IMAGE=gcr.io/$PROJECT_ID/$LOGOUTPUT_IMAGE:$BRANCH-$GITHUB_SHA
+          kustomize edit set image PROJECT/PINGPONG_IMAGE=gcr.io/$PROJECT_ID/$PINGPONG_IMAGE:$BRANCH-$GITHUB_SHA
+          kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment $DEPLOYMENT
+          kubectl get services -o wide
