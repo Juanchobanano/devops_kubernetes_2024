@@ -3,7 +3,7 @@ name: Release project application
 on:
   push:
     paths:
-      - 'assingments/part3/exercise_310/**' 
+      - 'assingments/part3/exercise_303/**' 
       - '.github/workflows/project.yaml'
 
 env:
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./assingments/part3/exercise_310
+        working-directory: ./assingments/part3/exercise_303
 
     steps:
       - name: Checkout
@@ -67,13 +67,13 @@ jobs:
 
       - name: Deploy
         run: |-
-          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
-          kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
-          kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+          NAMESPACE=project
+          kubectl create namespace $NAMESPACE || true
+          kubectl config set-context --current --namespace=$NAMESPACE
+          kustomize edit set namespace $NAMESPACE
           kustomize edit set image PROJECT/TODO_APP_IMAGE=gcr.io/$PROJECT_ID/$TODO_APP_IMAGE:$BRANCH-$GITHUB_SHA
           kustomize edit set image PROJECT/TODO_BACKEND_IMAGE=gcr.io/$PROJECT_ID/$TODO_BACKEND_IMAGE:$BRANCH-$GITHUB_SHA
           kustomize edit set image PROJECT/REMAINDER_IMAGE=gcr.io/$PROJECT_ID/$REMAINDER_IMAGE:$BRANCH-$GITHUB_SHA
-          kustomize edit set image PROJECT/BACKUP_IMAGE=gcr.io/$PROJECT_ID/$BACKUP_IMAGE:$BRANCH-$GITHUB_SHA
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment $DEPLOYMENT
           kubectl get services -o wide

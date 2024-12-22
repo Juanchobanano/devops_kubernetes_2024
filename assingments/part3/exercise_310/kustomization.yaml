@@ -13,11 +13,12 @@ resources:
   - manifests/statefulset.yaml
 images:
   - name: PROJECT/TODO_APP_IMAGE
-    newName: juanchobanano13/todo-app:v0.3.10
+    newName: gcr.io/dwk-gke-445012/dwk-todo-app:main-0f65a705390061c15e5adb49698172e4e8c2c8be
   - name: PROJECT/TODO_BACKEND_IMAGE
-    newName: juanchobanano13/todo-backend:v0.3.10
+    newName: gcr.io/dwk-gke-445012/dwk-todo-backend:main-0f65a705390061c15e5adb49698172e4e8c2c8be
   - name: PROJECT/REMAINDER_IMAGE
-    newName: juanchobanano13/reminder:v0.3.10
+    newName: gcr.io/dwk-gke-445012/dwk-remainder:main-0f65a705390061c15e5adb49698172e4e8c2c8be
   - name: PROJECT/BACKUP_IMAGE
-    newName: juanchobanano13/backup:v0.3.10
+    newName: gcr.io/dwk-gke-445012/dwk-backup:main-0f65a705390061c15e5adb49698172e4e8c2c8be
+
 

@@ -5,7 +5,6 @@ resources:
   - manifests/cronjob.yaml
   - manifests/deployment.yaml
   - manifests/ingress.yaml
-  - manifests/persistentvolume.yaml
   - manifests/persistentvolumeclaim.yaml
   - manifests/podfordebugging.yaml
   - manifests/secret.yaml

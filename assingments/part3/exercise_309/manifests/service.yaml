@@ -4,7 +4,7 @@ metadata:
   name: logoutput-svc
   namespace: exercises
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: logoutput
   ports:
@@ -17,7 +17,7 @@ kind: Service
 metadata:
   name: pingpong-svc
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: pingpong
   ports:

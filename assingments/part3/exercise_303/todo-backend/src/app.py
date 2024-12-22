@@ -6,6 +6,12 @@ import utils
 import constants as ct
 from typing import Annotated
 from models import Todo, TodoModel
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 SessionDep = Annotated[Session, Depends(lambda: utils.get_session(ct.engine))]
 app = FastAPI()
@@ -34,8 +40,11 @@ async def get_todos(session: SessionDep):
 async def create_todo(session: SessionDep, todo: TodoModel):
 
     todo_description = todo.description
-    print(f"Todo description: {todo_description}")
-    if len(todo_description) < ct.MAX_CHARACTERS:
+    logger.info(f"Todo description: {todo_description}")
+    if len(todo_description) > ct.MAX_CHARACTERS:
+        logger.error(
+            "Todo description is too long:"
+            f"{len(todo_description)} characters.")
         return {
             "message": (
                 "Todo description must be at most"
@@ -48,6 +57,7 @@ async def create_todo(session: SessionDep, todo: TodoModel):
     session_.add(todo_obj)
     session_.commit()
     session_.close()
+    logging.info("Todo created successfully")
     return {
         "message": "Todo created successfully",
         "status_code": 200

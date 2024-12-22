@@ -41,7 +41,7 @@ async def create_todo(session: SessionDep, todo: TodoModel):
 
     todo_description = todo.description
     logger.info(f"Todo description: {todo_description}")
-    if len(todo_description) < ct.MAX_CHARACTERS:
+    if len(todo_description) > ct.MAX_CHARACTERS:
         logger.error(
             "Todo description is too long:"
             f"{len(todo_description)} characters.")
