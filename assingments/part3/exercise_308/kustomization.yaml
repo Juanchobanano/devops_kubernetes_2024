@@ -1,15 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - manifests/configmap.yaml
-  - manifests/cronjob.yaml
+  # - manifests/configmap.yaml
+  # - manifests/cronjob.yaml
   - manifests/deployment.yaml
-  - manifests/ingress.yaml
-  - manifests/persistentvolumeclaim.yaml
-  - manifests/podfordebugging.yaml
-  - manifests/secret.yaml
-  - manifests/service.yaml
-  - manifests/statefulset.yaml
+  # - manifests/ingress.yaml
+  # - manifests/persistentvolumeclaim.yaml
+  # - manifests/podfordebugging.yaml
+  # - manifests/secret.yaml
+  # - manifests/service.yaml
+  # - manifests/statefulset.yaml
 images:
   - name: PROJECT/TODO_APP_IMAGE
     newName: gcr.io/dwk-gke-445012/dwk-todo-app:main-0f65a705390061c15e5adb49698172e4e8c2c8be
