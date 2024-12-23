@@ -69,7 +69,7 @@ jobs:
         run: |-
           NAMESPACE=${GITHUB_REF#refs/heads/}
           if [[ "$NAMESPACE" == "main" ]]; then
-            NAMESPACE="default"
+            NAMESPACE="project"
           fi
           kubectl create namespace $NAMESPACE || true
           kubectl config set-context --current --namespace=$NAMESPACE
