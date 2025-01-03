@@ -7,12 +7,13 @@ import constants as ct
 from typing import Annotated
 from models import Todo, TodoModel
 import logging
+import sys
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.StreamHandler()
+        logging.StreamHandler(sys.stdout)
     ]
 )
 logger = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ async def create_todo(session: SessionDep, todo: TodoModel):
 
 
 if __name__ == "__main__":
-    print(f"Server started on port {ct.PORT}")
+    logger.info(f"Server started on port {ct.PORT}")
     uvicorn.run(
         "app:app",
         host="0.0.0.0",
