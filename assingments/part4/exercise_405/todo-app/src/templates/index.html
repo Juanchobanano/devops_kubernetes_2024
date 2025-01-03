@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Todo App</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+    <script>
+        async function markAsComplete(todoId) {
+            try {
+                const response = await fetch("/todos", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: todoId }),
+                });
+
+                if (response.ok) {
+                    window.location.reload(); // Refresh the page to fetch the updated todo list
+                } else {
+                    const errorData = await response.json();
+                    errorElement.textContent = errorData.message || "Failed to update todo.";
+                }
+            } catch (error) {
+                errorElement.textContent = "An error occurred. Please try again.";
+            }
+        }
+
+        async function addTodo() {
+            const todoInput = document.getElementById("todoInput").value;
+            const errorElement = document.getElementById("error");
+
+            if (todoInput.length > 140 || todoInput.trim() === "") {
+                errorElement.textContent = "Todo must be between 1 and 140 characters!";
+                return;
+            }
+
+            try {
+                const response = await fetch("/todos", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ description: todoInput }),
+                });
+
+                if (response.ok) {
+                    window.location.reload(); // Refresh the page to fetch the updated todo list
+                } else {
+                    const errorData = await response.json();
+                    errorElement.textContent = errorData.message || "Failed to add todo.";
+                }
+            } catch (error) {
+                errorElement.textContent = "An error occurred. Please try again.";
+            }
+        }
+    </script>
+
+    <h1>FastAPI Todo App</h1>
+    <img src="{{ image_url }}" alt="Random Image" style="max-width: 30%; height: auto;">
+
+
+    <p>Add a new todo (140 characters max):</p>
+    <input type="text" id="todoInput" placeholder="Enter your todo here">
+    <button onclick="addTodo()">Send</button>
+    <p id="error" class="error"></p>
+
+    <h2>Todo List</h2>
+    <ul>
+        {% for i in todos %}
+        <li style="border-radius: 10px; background-color: {% if i.done %}#d4edda{% else %}#f8d7da{% endif %}; display: flex; justify-content: space-between; padding: 5px; margin: 5px;">
+            <p style="margin-left: 5px;">{{ i.description }}</p>
+            {% if not i.done %}
+            <button onclick="markAsComplete('{{ i.id }}')">Complete</button>
+            {% else %}
+            <p style="color:#156a29; margin-right:5px;">Completed</p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    
+</body>
+
+</html>

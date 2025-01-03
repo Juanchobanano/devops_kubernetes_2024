@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: todo-app-rollout
+  namespace: project
+spec:
+  replicas: 3
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10
+      - pause:
+          duration: 10m
+      - analysis:
+          templates:
+          - templateName: cpu-usage-monitor
+          args:
+          - name: namespace
+            value: "project"  # Replace with the actual namespace
+      - setWeight: 50
+      - pause:
+          duration: 10m
+      - setWeight: 100
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      volumes:
+        - name: shared-pv
+          persistentVolumeClaim:
+            claimName: sharefile-claim
+      containers:
+        - name: todo-app
+          image: PROJECT/TODO_APP_IMAGE
+          readinessProbe:
+            exec:
+              command:
+                - "/bin/sh"
+                - "-c"
+                - "curl --silent --fail http://todo-backend-svc:2348/healthz || exit 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+          livenessProbe:
+            exec:
+              command:
+                - "/bin/sh"
+                - "-c"
+                - "curl --silent --fail http://todo-backend-svc:2348/healthz || exit 1"
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 2
+          # resources:
+          #   limits:
+          #     cpu: "6m"
+          #     memory: "50Mi"
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8000"
+            - name: TODOS_HOST
+              value: "todo-backend-svc"
+            - name: TODOS_PORT
+              value: "2348"
+          volumeMounts:
+          - name: shared-pv
+            mountPath: /usr/src/app/files

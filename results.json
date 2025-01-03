@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"gnatsd_connz_in_msgs","container":"metrics","endpoint":"tcp-metrics","instance":"10.42.2.242:7777","job":"my-nats-metrics","namespace":"default","pod":"my-nats-0","server_id":"http://localhost:8222","service":"my-nats-metrics"},"value":[1735048493.107,"41655"]}]}}

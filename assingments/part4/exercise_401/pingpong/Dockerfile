@@ -15,7 +15,10 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-    
+
+# Install curl
+RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y postgresql-client
 
 # Install any necessary dependencies
 RUN pip install --no-cache-dir --upgrade pip && \

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: logoutput
+  namespace: exercises
 spec:
   replicas: 1
   selector:
@@ -32,19 +33,23 @@ spec:
                 configMapKeyRef:
                   name: example-configmap
                   key: message
+            - name: DATABASE_HOST
+              value: "postgres-svc"
+            - name: DATABASE_PORT
+              value: "5432"
           volumeMounts:
           - name: config
             mountPath: "/config"
             readOnly: true
           readinessProbe:
-            httpGet:
-              path: /health
-              port: 2346
-              httpHeaders:
-                - name: Host
-                  value: pingpong-svc
-            initialDelaySeconds: 5
+            exec:
+              command:
+                - "/bin/sh"
+                - "-c"
+                - "curl --silent --fail http://pingpong-svc:2346/healthz || exit 1"
+            initialDelaySeconds: 15
             periodSeconds: 10
+            timeoutSeconds: 2
       volumes:
         - name: config
           configMap:
@@ -57,6 +62,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pingpong
+  namespace: exercises
 spec:
   replicas: 1
   selector:
@@ -70,6 +76,7 @@ spec:
       containers:
         - name: pingpong
           image: PROJECT/PINGPONG_IMAGE
+          
           # resources:
           #   limits:
           #     cpu: "150m"
@@ -98,8 +105,14 @@ spec:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
           readinessProbe:
-            tcpSocket:
-              host: postgres-svc
-              port: 5432
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  pg_isready -U "postgres" -h ${DATABASE_HOST} -p ${DATABASE_PORT}
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3

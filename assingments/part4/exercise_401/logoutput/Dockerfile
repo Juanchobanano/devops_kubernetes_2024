@@ -10,9 +10,13 @@ COPY ./src /app
 # Set environment variable to disable Python output buffering
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y postgresql-client
+
 # Install any necessary dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install fastapi uvicorn requests
 
+    
 # Run the FastAPI server
 CMD ["python", "app.py"]

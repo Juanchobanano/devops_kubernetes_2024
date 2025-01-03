@@ -5,7 +5,7 @@ metadata:
   labels:
     app: postgres
 data:
-  POSTGRES_DB: ps_project
+  POSTGRES_DB: ps_db
   POSTGRES_USER: ps_user
 ---
 apiVersion: v1

@@ -22,9 +22,9 @@ async def root():
     return "Hello World!"
 
 
-@app.get("/health", response_class=PlainTextResponse)
-async def health():
-    return "App working!"
+@app.get("/healthz", response_class=PlainTextResponse)
+async def healthz():
+    return "OK"
 
 
 @app.get("/pingpong", response_class=PlainTextResponse)
