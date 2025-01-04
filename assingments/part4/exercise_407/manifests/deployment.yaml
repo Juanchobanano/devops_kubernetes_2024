@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logoutput
+  namespace: exercises
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logoutput
+  template:
+    metadata:
+      labels:
+        app: logoutput
+    spec:
+      containers:
+        - name: logoutput
+          image: PROJECT/LOGOUTPUT_IMAGE
+          # resources:
+          #   limits:
+          #     cpu: "150m"
+          #     memory: "100Mi"
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8001"
+            - name: PINGPONG_HOST
+              value: "pingpong-svc"
+            - name: PINGPONG_PORT
+              value: "2346"
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: example-configmap
+                  key: message
+            - name: DATABASE_HOST
+              value: "postgres-svc"
+            - name: DATABASE_PORT
+              value: "5432"
+          volumeMounts:
+          - name: config
+            mountPath: "/config"
+            readOnly: true
+          readinessProbe:
+            exec:
+              command:
+                - "/bin/sh"
+                - "-c"
+                - "curl --silent --fail http://pingpong-svc:2346/healthz || exit 1"
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+      volumes:
+        - name: config
+          configMap:
+            name: example-configmap
+            items:
+            - key: "serverconfig.txt"
+              path: "serverconfig.txt"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong
+  namespace: exercises
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong
+  template:
+    metadata:
+      labels:
+        app: pingpong
+    spec:
+      containers:
+        - name: pingpong
+          image: PROJECT/PINGPONG_IMAGE
+          
+          # resources:
+          #   limits:
+          #     cpu: "150m"
+          #     memory: "100Mi"
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8002"
+            - name: DATABASE_HOST
+              value: "postgres-svc"
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  pg_isready -U "postgres" -h ${DATABASE_HOST} -p ${DATABASE_PORT}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3

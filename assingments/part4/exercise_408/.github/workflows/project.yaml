@@ -1,0 +1,77 @@
+name: Release application
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+    paths:
+      - 'assingments/part4/exercise_408/**' 
+      - '.github/workflows/project.yaml'
+
+
+jobs:
+  build-publish:
+    name: Build, Push, Release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./assingments/part4/exercise_408
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # tag image with the GitHub SHA to get a unique tag
+      - name: Build and publish backend
+        run: |-
+          docker build --tag "juanchobanano13/todo-app:$GITHUB_SHA" ./todo-app
+          docker push "juanchobanano13/todo-app:$GITHUB_SHA"
+
+          docker build --tag "juanchobanano13/todo-backend:$GITHUB_SHA" ./todo-backend
+          docker push "juanchobanano13/todo-backend:$GITHUB_SHA"
+
+          docker build --tag "juanchobanano13/remainder:$GITHUB_SHA" ./remainder
+          docker push "juanchobanano13/remainder:$GITHUB_SHA"
+
+          docker build --tag "juanchobanano13/broadcaster:$GITHUB_SHA" ./broadcaster
+          docker push "juanchobanano13/broadcaster:$GITHUB_SHA"
+
+          docker build --tag "juanchobanano13/backup:$GITHUB_SHA" ./backup
+          docker push "juanchobanano13/backup:$GITHUB_SHA"
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Use right image
+        run: |-
+          cd base
+          kustomize edit set image PROJECT/TODO_APP_IMAGE=juanchobanano13/todo-app:$GITHUB_SHA
+          kustomize edit set image PROJECT/TODO_BACKEND_IMAGE=juanchobanano13/todo-backend:$GITHUB_SHA
+          kustomize edit set image PROJECT/REMAINDER_IMAGE=juanchobanano13/remainder:$GITHUB_SHA
+          kustomize edit set image PROJECT/BACKUP_IMAGE=juanchobanano13/backup:$GITHUB_SHA
+          kustomize edit set image PROJECT/BROADCASTER_IMAGE=juanchobanano13/broadcaster:$GITHUB_SHA
+
+      - name: commit kustomization.yaml to GitHub
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'base/kustomization.yaml'
+          message: New version released ${{ github.sha }}
+
+      - name: Deploy to Staging
+        if: github.event_name == 'push' && !contains(github.ref, 'tags')
+        run: |
+          kubectl apply -k overlays/staging/
+
+      - name: Deploy to Production
+        if: github.event_name == 'push' && contains(github.ref, 'tags')
+        run: |
+          kubectl apply -k overlays/prod/
+

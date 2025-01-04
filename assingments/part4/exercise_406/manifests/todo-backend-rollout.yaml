@@ -1,0 +1,87 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: todo-backend-rollout
+  # namespace: project
+spec:
+  replicas: 3
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10
+      - pause:
+          duration: 10m
+      - analysis:
+          templates:
+          - templateName: cpu-usage-monitor
+          args:
+          - name: namespace
+            value: "project"  # Replace with the actual namespace
+      - setWeight: 50
+      - pause:
+          duration: 10m
+      - setWeight: 100
+  selector:
+    matchLabels:
+      app: todo-backend
+  template:
+    metadata:
+      labels:
+        app: todo-backend
+    spec:
+      containers:
+        - name: todo-backend
+          image: PROJECT/TODO_BACKEND_IMAGE
+          # resources:
+          #   limits:
+          #     cpu: "6m"
+          #     memory: "100Mi"
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8001"
+            - name: NATS_ENDPOINT
+              value: "nats://nats:4222"
+            - name: DATABASE_HOST
+              value: "postgres-svc"
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  pg_isready -U "postgres" -h ${DATABASE_HOST} -p ${DATABASE_PORT}
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  pg_isready -U "postgres" -h ${DATABASE_HOST} -p ${DATABASE_PORT}
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3

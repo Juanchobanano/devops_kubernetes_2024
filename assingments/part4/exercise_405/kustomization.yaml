@@ -15,12 +15,12 @@ resources:
   # - manifests/analysistemplate.yaml
 images:
   - name: PROJECT/TODO_APP_IMAGE
-    newName: juanchobanano13/todo-app:v0.4.2
+    newName: juanchobanano13/todo-app:v0.4.5
   - name: PROJECT/TODO_BACKEND_IMAGE
-    newName: juanchobanano13/todo-backend:v0.4.2
+    newName: juanchobanano13/todo-backend:v0.4.5
   - name: PROJECT/REMAINDER_IMAGE
-    newName: juanchobanano13/remainder:v0.4.2
+    newName: juanchobanano13/remainder:v0.4.5
   - name: PROJECT/BACKUP_IMAGE
-    newName: juanchobanano13/backup:v0.4.2
+    newName: juanchobanano13/backup:v0.4.5
 
 

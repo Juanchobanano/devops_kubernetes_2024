@@ -1,0 +1,7 @@
+resources:
+- ./../../base
+- manifests/cronjob_backup.yaml
+patches:
+  - path: manifests/broadcaster.yaml
+
+namePrefix: prod-

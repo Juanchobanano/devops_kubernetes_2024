@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  # namespace: project
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: ps_db
+  POSTGRES_USER: ps_user
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-config
+  # namespace: project
+  labels:
+    app: backup
+data:
+  BACKUP_BUCKET: juanchobanano-project-backup-bucket
