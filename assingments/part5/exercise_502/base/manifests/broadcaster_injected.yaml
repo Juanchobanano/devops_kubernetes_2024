@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broadcaster
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: broadcaster
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: broadcaster
+    spec:
+      containers:
+      - env:
+        - name: TELEGRAM_BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: TELEGRAM_BOT_TOKEN
+              name: telegram-secrets
+        - name: TELEGRAM_CHAT_ID
+          valueFrom:
+            secretKeyRef:
+              key: TELEGRAM_CHAT_ID
+              name: telegram-secrets
+        - name: NATS_ENDPOINT
+          value: nats://nats:4222
+        - name: FORWARD_TO_EXTERNAL_SERVICE
+          value: "false"
+        image: PROJECT/BROADCASTER_IMAGE
+        imagePullPolicy: Always
+        name: broadcaster
+---

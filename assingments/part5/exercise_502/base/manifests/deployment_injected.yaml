@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: todo-app
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "8000"
+        - name: TODOS_HOST
+          value: todo-backend-svc
+        - name: TODOS_PORT
+          value: "2348"
+        image: PROJECT/TODO_APP_IMAGE
+        imagePullPolicy: Always
+        name: todo-app
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl --silent --fail http://todo-backend-svc:2348/healthz || exit 1
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 2
+        volumeMounts:
+        - mountPath: /usr/src/app/files
+          name: shared-pv
+      volumes:
+      - name: shared-pv
+        persistentVolumeClaim:
+          claimName: sharefile-claim
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-backend
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+      labels:
+        app: todo-backend
+    spec:
+      containers:
+      - env:
+        - name: NATS_ENDPOINT
+          value: nats://nats:4222
+        - name: PORT
+          value: "8001"
+        - name: DATABASE_HOST
+          value: postgres-svc
+        - name: DATABASE_PORT
+          value: "5432"
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: postgres-config
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_USER
+              name: postgres-config
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: postgres-secret
+        image: PROJECT/TODO_BACKEND_IMAGE
+        imagePullPolicy: Always
+        name: todo-backend
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - |
+              pg_isready -U "postgres" -h ${DATABASE_HOST} -p ${DATABASE_PORT}
+          failureThreshold: 3
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+---

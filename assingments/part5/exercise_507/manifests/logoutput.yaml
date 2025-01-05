@@ -1,0 +1,49 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: logoutput
+  namespace: exercises
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1" # Optional: ensure at least 1 replica
+    spec:
+      containers:
+        - name: logoutput
+          image: PROJECT/LOGOUTPUT_IMAGE
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8001"
+            - name: PINGPONG_HOST
+              value: "pingpong-svc.exercises.svc.cluster.local"
+            - name: PINGPONG_PORT
+              value: "2346"
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: example-configmap
+                  key: message
+            - name: DATABASE_HOST
+              value: "postgres-svc.exercises.svc.cluster.local"
+            - name: DATABASE_PORT
+              value: "5432"
+          volumeMounts:
+            - name: config
+              mountPath: "/config"
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+      volumes:
+        - name: config
+          configMap:
+            name: example-configmap
+            items:
+              - key: "serverconfig.txt"
+                path: "serverconfig.txt"
